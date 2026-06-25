@@ -1,0 +1,1 @@
+-r discord_profile/backend/requirements.txt

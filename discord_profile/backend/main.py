@@ -1,5 +1,18 @@
 import os
-from fastapi import FastAPI
+import sys
+
+# =====================================================================
+# CORREÇÃO DE ROTAS LOCAL/DEPLOY (PEP 668 & ModuleNotFoundError)
+# Garante que o Python encontre o arquivo 'database.py' e outros módulos
+# =====================================================================
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
@@ -7,15 +20,21 @@ from pydantic import BaseModel
 import requests
 from dotenv import load_dotenv
 
-from backend.database import SessionLocal, engine, Base
-from backend.models import User, Comment
-
+# Carrega as variáveis de ambiente do arquivo .env (local) ou do Render (produção)
 load_dotenv()
 
-# Cria as tabelas do banco de dados (se não existirem)
+# Importações locais corrigidas
+from database import engine, Base, SessionLocal
+from models import User, Comment
+
+# Cria as tabelas no banco de dados se elas não existirem
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(
+    title="MuralDisc API",
+    description="Backend para gerenciamento de perfis do Discord",
+    version="1.0.0"
+)
 
 # Configurações usando variáveis de ambiente
 CLIENT_ID = os.getenv("CLIENT_ID", "1519752401945362582")
@@ -26,13 +45,22 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5500/discord_profile/
 
 REDIRECT_URI = "http://localhost:8000/auth/discord/callback"
 
+# Configuração do CORS para permitir que o GitHub Pages acesse sua API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Em produção, você pode trocar pelo link do seu GitHub Pages
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Dependência para obter a sessão do banco de dados nas rotas
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 # ==========================
@@ -51,7 +79,7 @@ class CommentCreate(BaseModel):
 
 @app.get("/")
 def home():
-    return {"status": "online"}
+    return {"status": "Sucesso", "mensagem": "API do MuralDisc rodando perfeitamente!"}
 
 
 # ==========================

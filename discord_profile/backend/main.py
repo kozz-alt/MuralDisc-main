@@ -7,8 +7,8 @@ from pydantic import BaseModel
 import requests
 from dotenv import load_dotenv
 
-from database import SessionLocal, engine, Base
-from models import User, Comment
+from backend.database import SessionLocal, engine, Base
+from backend.models import User, Comment
 
 load_dotenv()
 

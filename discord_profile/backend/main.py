@@ -41,9 +41,9 @@ CLIENT_ID = os.getenv("CLIENT_ID", "1519752401945362582")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET", "jN36MSochAWLlkshS7qYyekCorJtiUz3")
 
 # URL do frontend (ajuste se estiver rodando em outra porta)
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5500/discord_profile/frontend/index.html")
+FRONTEND_URL = "https://kozz-alt.github.io/MuralDisc-main/discord_profile/frontend/index.html"
 
-REDIRECT_URI = "https://muraldisc-main.onrender.com/callback"
+REDIRECT_URI = "https://muraldisc-main.onrender.com/auth/discord/callback"
 
 # Configuração do CORS para permitir que o GitHub Pages acesse sua API
 app.add_middleware(
